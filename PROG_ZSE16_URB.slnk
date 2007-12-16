@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<PROG NAME="ZSE16_URB" VARCL="X" SUBC="1" CNAM="BCUSER" CDAT="20071110" UNAM="BCUSER" UDAT="20071118" VERN="000069" RMAND="000" RLOAD="E" FIXPT="X" SDATE="20071118" STIME="061934" IDATE="20071118" ITIME="061934" UCCHECK="X">
+<PROG NAME="ZSE16_URB" VARCL="X" SUBC="1" CNAM="BCUSER" CDAT="20071110" UNAM="BCUSER" UDAT="20071206" VERN="000073" RMAND="000" RLOAD="E" FIXPT="X" SDATE="20071206" STIME="222443" IDATE="20071206" ITIME="222443" UCCHECK="X">
  <textPool>
   <language SPRAS="E">
    <textElement ID="I" KEY="AFI" ENTRY="All fields" LENGTH="25 "/>
@@ -146,7 +146,7 @@ class zse16_urb implementation.
       free &lt;so&gt;.
       idx = idx + 1.
     enddo.
-  endmethod.
+  endmethod.                    &quot;clear_selopts
   method gen_selopts.
     field-symbols:&lt;fields&gt; type ddfields,&lt;fn&gt; like c000.
     data: suffix(3) type n,
@@ -186,7 +186,19 @@ class zse16_urb implementation.
         &lt;fn&gt; = selopt-fieldname.
         append selopt to selopts.
       endloop.
+    else.
+      clear suffix.
     endif.
+*now let&apos;s clean the unused variables
+    do.
+      suffix = suffix + 1.
+      concatenate &apos;C&apos; suffix into selopt-varname.
+      assign (selopt-varname) to &lt;fn&gt;.
+      if sy-subrc &lt;&gt; 0.
+        exit.
+      endif.
+      &lt;fn&gt; = &apos;&apos;.
+    enddo.
   endmethod.                    &quot;gen_selopts
   method evt_at_selscreen.
     if sy-ucomm = &apos;TOGGLEK&apos;.
@@ -207,8 +219,12 @@ class zse16_urb implementation.
       get reference of &lt;sel&gt; into rtr.
       core-&gt;add_sel( id = selopt-fname rangetab = rtr ).
     endloop.
-    core-&gt;exec_query( ).
-    result = core-&gt;get_data( ).
+    try.
+        core-&gt;exec_query( ).
+        result = core-&gt;get_data( ).
+      catch cx_root.
+        message &apos;Error running the dynamic select&apos; type &apos;I&apos;.
+    endtry.
   endmethod.                    &quot;evt_startsel
   method          evt_endsel.
     field-symbols: &lt;tab&gt; type any table.
