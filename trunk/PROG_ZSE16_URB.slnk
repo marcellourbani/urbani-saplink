@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
-<PROG NAME="ZSE16_URB" VARCL="X" SUBC="1" CNAM="BCUSER" CDAT="20071110" UNAM="BCUSER" UDAT="20071206" VERN="000073" RMAND="000" RLOAD="E" FIXPT="X" SDATE="20071206" STIME="222443" IDATE="20071206" ITIME="222443" UCCHECK="X">
+<PROG NAME="ZSE16_URB" VARCL="X" SUBC="1" CNAM="BCUSER" CDAT="20071110" UNAM="BCUSER" UDAT="20080101" VERN="000082" RMAND="000" RLOAD="E" FIXPT="X" SDATE="20080101" STIME="084350" IDATE="20080101" ITIME="084350" UCCHECK="X">
  <textPool>
+  <language SPRAS="E">
+   <textElement ID="I" KEY="AFI" ENTRY="All fields" LENGTH="25 "/>
+   <textElement ID="I" KEY="KFI" ENTRY="Only (foreign)key fields" LENGTH="25 "/>
+   <textElement ID="R" ENTRY="Program ZSE16_URB" LENGTH="17 "/>
+  </language>
   <language SPRAS="E">
    <textElement ID="I" KEY="AFI" ENTRY="All fields" LENGTH="25 "/>
    <textElement ID="I" KEY="KFI" ENTRY="Only (foreign)key fields" LENGTH="25 "/>
@@ -151,9 +156,11 @@ class zse16_urb implementation.
     field-symbols:&lt;fields&gt; type ddfields,&lt;fn&gt; like c000.
     data: suffix(3) type n,
           tmp type string,
-          wfield type dfies.
+          wfield type dfies,
+          nt type abap_bool.
+    nt = newtab( ).
     &quot;Check if we have to instantiate the core class.
-    if newtab( ) = abap_true.
+    if nt = abap_true or core is not bound.
       try.
           create object core
             exporting
@@ -162,7 +169,7 @@ class zse16_urb implementation.
           clear core.
           free selopts.
       endtry.
-      if sy-slset = old_sset.
+      if sy-slset = old_sset and nt = abap_true.
         clear_selopts( ).
       endif.
     endif.
@@ -214,6 +221,7 @@ class zse16_urb implementation.
     field-symbols:&lt;sel&gt; type any table.
     data: rtr type ref to data.
     check core is bound.
+    check newtab( ) = abap_false.
     loop at selopts into selopt.
       assign (selopt-seloptname) to &lt;sel&gt;.
       get reference of &lt;sel&gt; into rtr.
@@ -227,17 +235,26 @@ class zse16_urb implementation.
     endtry.
   endmethod.                    &quot;evt_startsel
   method          evt_endsel.
+    data:func type ref to cl_salv_functions,
+         layout type ref to cl_salv_layout,
+         lkey    type salv_s_layout_key.
     field-symbols: &lt;tab&gt; type any table.
     check result is bound.
     assign result-&gt;* to &lt;tab&gt;.
     data alv type ref to cl_salv_table .
     cl_salv_table=&gt;factory( importing r_salv_table = alv
                             changing  t_table      = &lt;tab&gt; ).
+    func = alv-&gt;get_functions_base( ).
+    func-&gt;set_all( ).
+    lkey-report = sy-repid.
+    layout = alv-&gt;get_layout( ).
+    layout-&gt;set_key( lkey ).
+    layout-&gt;set_save_restriction( if_salv_c_layout=&gt;restrict_none ).
     alv-&gt;display( ).
   endmethod.                    &quot;evt_endsel
   method newtab.
     if core is not bound.
-      nt = abap_true.
+      nt = abap_false.
     else.
       if tabname = core-&gt;tabname.
         nt = abap_false.
