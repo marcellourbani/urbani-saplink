@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<CLAS CLSNAME="ZCL_SE16_ASSIST" VERSION="1" LANGU="E" DESCRIPT="Assistance Class for ZSE16" UUID="DC8A756BDECC60F19A65000C29E2C3D0" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" AUTHOR="BCUSER" CREATEDON="20071103" CHANGEDON="00000000" CHGDANYON="00000000" UNICODE="X" R3RELEASE="700" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 " REFCLSNAME="CL_WD_COMPONENT_ASSISTANCE">
+ <publicSection>class ZCL_SE16_ASSIST definition
+  public
+  inheriting from CL_WD_COMPONENT_ASSISTANCE
+  create public .
+
+*&quot;* public components of class ZCL_SE16_ASSIST
+*&quot;* do not include other source files here!!!
+public section.</publicSection>
+ <protectedSection>*&quot;* protected components of class ZCL_SE16_ASSIST
+*&quot;* do not include other source files here!!!
+protected section.</protectedSection>
+ <privateSection>*&quot;* private components of class ZCL_SE16_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</privateSection>
+ <localImplementation>*&quot;* private components of class ZCL_SE16_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</localImplementation>
+ <localTypes>*&quot;* private components of class ZCL_SE16_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</localTypes>
+ <localMacros>*&quot;* private components of class ZCL_SE16_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</localMacros>
+ <inheritance CLSNAME="ZCL_SE16_ASSIST" REFCLSNAME="CL_WD_COMPONENT_ASSISTANCE" VERSION="1" STATE="1" AUTHOR="BCUSER" CREATEDON="20071103" CHANGEDON="00000000"/>
+</CLAS>

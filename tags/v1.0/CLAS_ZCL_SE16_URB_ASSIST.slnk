@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<CLAS CLSNAME="ZCL_SE16_URB_ASSIST" VERSION="1" LANGU="E" DESCRIPT="Assistance Class for ZSE16_URB" UUID="DC90AA465E32B0F19A68000C29E2C3D0" CATEGORY="00" EXPOSURE="2" STATE="1" RELEASE="0" AUTHOR="BCUSER" CREATEDON="20071111" CHANGEDON="00000000" CHGDANYON="00000000" UNICODE="X" R3RELEASE="700" CLSBCCAT="00" DURATION_TYPE="0 " RISK_LEVEL="0 " REFCLSNAME="CL_WD_COMPONENT_ASSISTANCE">
+ <publicSection>class ZCL_SE16_URB_ASSIST definition
+  public
+  inheriting from CL_WD_COMPONENT_ASSISTANCE
+  create public .
+
+*&quot;* public components of class ZCL_SE16_URB_ASSIST
+*&quot;* do not include other source files here!!!
+public section.
+  type-pools ABAP .
+
+  data MESSMAN type ref to IF_WD_MESSAGE_MANAGER read-only .
+
+  methods DO_INIT
+    importing
+      !CONTROLLER type ref to OBJECT optional .
+  methods REPORT_ERROR
+    importing
+      !TEXT_ID type WDR_TEXT_KEY
+      !PARAMS type WDR_NAME_VALUE_LIST optional
+      !MSG_USER_DATA type ref to DATA optional
+      !VIEW type STRING optional
+      !SHOW_AS_POPUP type ABAP_BOOL optional
+      !IS_PERMANENT type ABAP_BOOL optional
+      !SCOPE_PERMANENT_MSG type WDR_MESSAGE_SCOPE optional
+      !CONTROLLER_PERMANENT_MSG type ref to IF_WD_CONTROLLER optional
+      !MSG_INDEX type I optional
+      !CANCEL_NAVIGATION type ABAP_BOOL optional .</publicSection>
+ <protectedSection>*&quot;* protected components of class ZCL_SE16_URB_ASSIST
+*&quot;* do not include other source files here!!!
+protected section.</protectedSection>
+ <privateSection>*&quot;* private components of class ZCL_SE16_URB_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</privateSection>
+ <localImplementation>*&quot;* private components of class ZCL_SE16_URB_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</localImplementation>
+ <localTypes>*&quot;* private components of class ZCL_SE16_URB_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</localTypes>
+ <localMacros>*&quot;* private components of class ZCL_SE16_URB_ASSIST
+*&quot;* do not include other source files here!!!
+private section.</localMacros>
+ <typeUsage CLSNAME="ZCL_SE16_URB_ASSIST" TYPEGROUP="ABAP" VERSION="1" TPUTYPE="0" EXPLICIT="X"/>
+ <forwardDeclaration>ABAP</forwardDeclaration>
+ <attribute CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="MESSMAN" VERSION="1" LANGU="E" DESCRIPT="Message Manager" EXPOSURE="2" STATE="1" EDITORDER="1 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDON="00000000" ATTDECLTYP="0" ATTRDONLY="X" ATTEXPVIRT="0" TYPTYPE="3" TYPE="IF_WD_MESSAGE_MANAGER" SRCROW1="0 " SRCCOLUMN1="0 " SRCROW2="0 " SRCCOLUMN2="0 " R3RELEASE="700" TYPESRC_LENG="0 "/>
+ <inheritance CLSNAME="ZCL_SE16_URB_ASSIST" REFCLSNAME="CL_WD_COMPONENT_ASSISTANCE" VERSION="1" STATE="1" AUTHOR="BCUSER" CREATEDON="20071111" CHANGEDON="00000000"/>
+ <method CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="DO_INIT" VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" EDITORDER="1 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071111" CHANGEDON="00000000" MTDTYPE="0" MTDDECLTYP="0" R3RELEASE="700" BCMTDCAT="00" BCMTDSYN="0">
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="DO_INIT" SCONAME="CONTROLLER" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071111" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="3" TYPE="OBJECT" PAROPTIONL="X"/>
+  <source>method DO_INIT.
+*       get message manager
+      data: l_current_controller type ref to if_wd_controller,
+            tmp type ref to object.
+
+*      l_current_controller ?=
+      call method controller-&gt;(&apos;WD_GET_API&apos;)  receiving Result = tmp.
+      l_current_controller ?= tmp.
+      messman = l_current_controller-&gt;get_message_manager( ).
+endmethod.</source>
+ </method>
+ <method CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" VERSION="1" LANGU="E" EXPOSURE="2" STATE="1" EDITORDER="2 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" MTDTYPE="0" MTDDECLTYP="0" R3RELEASE="700" BCMTDCAT="00" BCMTDSYN="0">
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="TEXT_ID" VERSION="1" LANGU="E" DESCRIPT="Web Dynpro: Text Key" CMPTYPE="1" MTDTYPE="0" EDITORDER="1 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="WDR_TEXT_KEY"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="PARAMS" VERSION="1" LANGU="E" DESCRIPT="Table of Name/Value Pairs" CMPTYPE="1" MTDTYPE="0" EDITORDER="2 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="WDR_NAME_VALUE_LIST" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="MSG_USER_DATA" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="3 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="3" TYPE="DATA" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="VIEW" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="4 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="STRING" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="SHOW_AS_POPUP" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="5 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="IS_PERMANENT" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="6 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="SCOPE_PERMANENT_MSG" VERSION="1" LANGU="E" DESCRIPT="Web Dynpro: Lifetime of Message" CMPTYPE="1" MTDTYPE="0" EDITORDER="7 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="WDR_MESSAGE_SCOPE" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="CONTROLLER_PERMANENT_MSG" VERSION="1" LANGU="E" DESCRIPT="Web Dynpro: Controller Interface" CMPTYPE="1" MTDTYPE="0" EDITORDER="8 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="3" TYPE="IF_WD_CONTROLLER" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="MSG_INDEX" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="9 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="I" PAROPTIONL="X"/>
+  <parameter CLSNAME="ZCL_SE16_URB_ASSIST" CMPNAME="REPORT_ERROR" SCONAME="CANCEL_NAVIGATION" VERSION="1" LANGU="E" CMPTYPE="1" MTDTYPE="0" EDITORDER="10 " DISPID="0 " AUTHOR="BCUSER" CREATEDON="20071117" CHANGEDBY="BCUSER" CHANGEDON="20071117" PARDECLTYP="0" PARPASSTYP="1" TYPTYPE="1" TYPE="ABAP_BOOL" PAROPTIONL="X"/>
+  <source>method report_error.
+  data: text type string.
+  text = if_wd_component_assistance~get_text( text_id ).
+
+* report message
+  call method messman-&gt;report_error_message
+    exporting
+      message_text             = text
+      params                   = params
+      msg_user_data            = msg_user_data
+      view                     = view
+      show_as_popup            = show_as_popup
+      is_permanent             = is_permanent
+      scope_permanent_msg      = scope_permanent_msg
+      controller_permanent_msg = controller_permanent_msg
+      msg_index                = msg_index
+      cancel_navigation        = cancel_navigation.
+endmethod.</source>
+ </method>
+</CLAS>

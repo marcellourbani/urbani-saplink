@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<PROG NAME="ZSE16_URB" VARCL="X" SUBC="1" CNAM="BCUSER" CDAT="20071110" UNAM="BCUSER" UDAT="20080101" VERN="000082" RMAND="000" RLOAD="E" FIXPT="X" SDATE="20080101" STIME="084350" IDATE="20080101" ITIME="084350" UCCHECK="X">
+ <textPool>
+  <language SPRAS="E">
+   <textElement ID="I" KEY="AFI" ENTRY="All fields" LENGTH="25 "/>
+   <textElement ID="I" KEY="KFI" ENTRY="Only (foreign)key fields" LENGTH="25 "/>
+   <textElement ID="R" ENTRY="Program ZSE16_URB" LENGTH="17 "/>
+  </language>
+  <language SPRAS="E">
+   <textElement ID="I" KEY="AFI" ENTRY="All fields" LENGTH="25 "/>
+   <textElement ID="I" KEY="KFI" ENTRY="Only (foreign)key fields" LENGTH="25 "/>
+   <textElement ID="R" ENTRY="Program ZSE16_URB" LENGTH="17 "/>
+  </language>
+ </textPool>
+ <source>*SE16 clone - uses dynamic programming instead of creating reports
+* supports up to 190 select-options
+* uses class ZCL_SE16_CORE for the &quot;business logic&quot;
+report  zse16_urb.
+type-pools:abap.
+*Begin of macro definitions
+*I seldom use macros, but these declarations are too boring
+*and you don&apos;t have to debug them anyway.Generates code like:
+* data c001 like tabfield-lfieldname and select-options:so001 for (c001)
+define fvar.
+  data:c&amp;1 like tabfield-lfieldname.
+end-of-definition.
+define fvars.
+  fvar &amp;10.fvar &amp;11.fvar &amp;12.fvar &amp;13.fvar &amp;14.
+  fvar &amp;15.fvar &amp;16.fvar &amp;17.fvar &amp;18.fvar &amp;19.
+end-of-definition.
+define sop.
+  select-options:    so&amp;1 for (c&amp;1).
+end-of-definition.
+define sops.
+  sop &amp;10.sop &amp;11.sop &amp;12.sop &amp;13.sop &amp;14.
+  sop &amp;15.sop &amp;16.sop &amp;17.sop &amp;18.sop &amp;19.
+end-of-definition.
+*End of macro definitions
+*Local class to handle report-specific logic (es. screen handling)
+class zse16_urb definition.
+  public section.
+    methods:constructor,
+            evt_scr_out,
+            evt_at_selscreen,
+            evt_startsel,
+            evt_endsel.
+  private section.
+    data:core type ref to zcl_se16_core,
+         begin of selopt,
+           fname type string,
+           fieldname type string,
+           varname type string,
+           seloptname type string,
+         end of selopt,
+         selopts like table of selopt,
+         old_sset like sy-slset,
+         result  type ref to data.
+    methods:newtab returning value(nt) type abap_bool,
+            gen_selopts,
+            clear_selopts.
+endclass.                    &quot;zse16_urb DEFINITION
+data:handle type ref to zse16_urb.
+*variables to dynamically set the select- options behaviour
+fvars 00.fvars 01.fvars 02.fvars 03.fvars 04.fvars 05.fvars 06.fvars 07.
+fvars 08.fvars 09.fvars 10.fvars 11.fvars 12.fvars 13.fvars 14.fvars 15.
+fvars 16.fvars 17.fvars 18.
+
+*SELECTION SCREEN START
+parameters: tabname like dd02l-tabname obligatory,
+            keysonly type abap_bool default abap_true no-display.
+selection-screen skip.
+selection-screen: pushbutton /10(25) ball user-command togglek.
+selection-screen skip.
+*select options - parametryzed by the above variables
+sops 00.sops 01.sops 02.sops 03.sops 04.sops 05.sops 06.sops 07.
+sops 08.sops 09.sops 10.sops 11.sops 12.sops 13.sops 14.sops 15.
+sops 16.sops 17.sops 18.
+*SELECTION SCREEN END
+
+*Events
+initialization.
+  create object handle.
+
+at selection-screen output.
+  handle-&gt;evt_scr_out( ).
+
+at selection-screen.
+  handle-&gt;evt_at_selscreen( ).
+
+start-of-selection.
+  handle-&gt;evt_startsel( ).
+
+end-of-selection.
+  handle-&gt;evt_endsel( ).
+
+*
+class zse16_urb implementation.
+  method constructor.
+*If we don&apos;t reset flag_query_active in rsdbrunt the type of
+* dynamic select options is only read once
+    try.
+        perform set_query_active in program rsdbrunt using &apos;A&apos;.
+      catch cx_root.
+        &quot; This shouldn&apos;t be needed, but since we&apos;re using undocumented
+        &quot; features I prefer to have another way to do the same thing
+        &quot; It&apos;s commented out because it&apos;s not too likely to work in the
+        &quot; perform above doesn&apos;t.
+*      field-SYMBOLS &lt;qa&gt; TYPE any.
+*      assign (&apos;(RSDBRUNT)FLAG_QUERY_ACTIVE&apos;) to &lt;qa&gt;.
+*      if sy-subrc = 0.
+*        &lt;qa&gt; = &apos;A&apos;.
+*      endif.
+    endtry.
+  endmethod.                    &quot;evt_init
+  method evt_scr_out.
+    data: suffix(3) type n,
+          varname type string.
+    if keysonly eq abap_false.
+      ball = &apos;Only (foreign)key fields&apos;(kfi).
+    else.
+      ball = &apos;All fields&apos;(afi).
+    endif.
+    gen_selopts( ).
+    loop at screen.
+      suffix = 999.
+      if screen-name(4) = &apos;%_SO&apos;.
+        suffix = screen-name+4(3).
+      endif.
+      if screen-name(2) = &apos;SO&apos;.
+        suffix = screen-name+2(3).
+      endif.
+      check suffix &lt;&gt; 999.
+      concatenate &apos;C&apos; suffix into varname.
+      read table selopts into selopt with key varname = varname.
+      if sy-subrc &lt;&gt; 0.
+        screen-active = 0.
+        modify screen.
+      endif.
+    endloop.
+    old_sset = sy-slset.
+  endmethod.                    &quot;evt_scr_out
+  method  clear_selopts.
+    field-symbols:&lt;so&gt; like so001[].
+    data: idx(3) type n,soname type string.
+    do.
+      concatenate &apos;SO&apos; idx &apos;[]&apos; into soname.
+      assign (soname) to &lt;so&gt;.
+      if sy-subrc &lt;&gt; 0.
+        exit.
+      endif.
+      free &lt;so&gt;.
+      idx = idx + 1.
+    enddo.
+  endmethod.                    &quot;clear_selopts
+  method gen_selopts.
+    field-symbols:&lt;fields&gt; type ddfields,&lt;fn&gt; like c000.
+    data: suffix(3) type n,
+          tmp type string,
+          wfield type dfies,
+          nt type abap_bool.
+    nt = newtab( ).
+    &quot;Check if we have to instantiate the core class.
+    if nt = abap_true or core is not bound.
+      try.
+          create object core
+            exporting
+              name = tabname.
+        catch cx_root.
+          clear core.
+          free selopts.
+      endtry.
+      if sy-slset = old_sset and nt = abap_true.
+        clear_selopts( ).
+      endif.
+    endif.
+    &quot;dynamic select-options
+    if core is bound.
+      free selopts.
+      if keysonly is initial.
+        assign core-&gt;userfields to &lt;fields&gt;.
+      else.
+        assign core-&gt;mainfields to &lt;fields&gt;.
+      endif.
+      loop at &lt;fields&gt; into wfield.
+        suffix = sy-tabix - 1.
+        clear selopt.
+        selopt-fname = wfield-fieldname.
+        concatenate core-&gt;tabname &apos;-&apos; wfield-fieldname into
+                    selopt-fieldname.
+        concatenate &apos;C&apos; suffix into selopt-varname.
+        concatenate &apos;SO&apos; suffix &apos;[]&apos; into selopt-seloptname.
+        assign (selopt-varname) to &lt;fn&gt;.
+        &lt;fn&gt; = selopt-fieldname.
+        append selopt to selopts.
+      endloop.
+    else.
+      clear suffix.
+    endif.
+*now let&apos;s clean the unused variables
+    do.
+      suffix = suffix + 1.
+      concatenate &apos;C&apos; suffix into selopt-varname.
+      assign (selopt-varname) to &lt;fn&gt;.
+      if sy-subrc &lt;&gt; 0.
+        exit.
+      endif.
+      &lt;fn&gt; = &apos;&apos;.
+    enddo.
+  endmethod.                    &quot;gen_selopts
+  method evt_at_selscreen.
+    if sy-ucomm = &apos;TOGGLEK&apos;.
+      if keysonly = &apos;X&apos;.
+        clear keysonly.
+      else.
+        keysonly = &apos;X&apos;.
+      endif.
+      clear_selopts( ).
+    endif.
+  endmethod.                    &quot;evt_at_selscreen
+  method          evt_startsel.
+    field-symbols:&lt;sel&gt; type any table.
+    data: rtr type ref to data.
+    check core is bound.
+    check newtab( ) = abap_false.
+    loop at selopts into selopt.
+      assign (selopt-seloptname) to &lt;sel&gt;.
+      get reference of &lt;sel&gt; into rtr.
+      core-&gt;add_sel( id = selopt-fname rangetab = rtr ).
+    endloop.
+    try.
+        core-&gt;exec_query( ).
+        result = core-&gt;get_data( ).
+      catch cx_root.
+        message &apos;Error running the dynamic select&apos; type &apos;I&apos;.
+    endtry.
+  endmethod.                    &quot;evt_startsel
+  method          evt_endsel.
+    data:func type ref to cl_salv_functions,
+         layout type ref to cl_salv_layout,
+         lkey    type salv_s_layout_key.
+    field-symbols: &lt;tab&gt; type any table.
+    check result is bound.
+    assign result-&gt;* to &lt;tab&gt;.
+    data alv type ref to cl_salv_table .
+    cl_salv_table=&gt;factory( importing r_salv_table = alv
+                            changing  t_table      = &lt;tab&gt; ).
+    func = alv-&gt;get_functions_base( ).
+    func-&gt;set_all( ).
+    lkey-report = sy-repid.
+    layout = alv-&gt;get_layout( ).
+    layout-&gt;set_key( lkey ).
+    layout-&gt;set_save_restriction( if_salv_c_layout=&gt;restrict_none ).
+    alv-&gt;display( ).
+  endmethod.                    &quot;evt_endsel
+  method newtab.
+    if core is not bound.
+      nt = abap_false.
+    else.
+      if tabname = core-&gt;tabname.
+        nt = abap_false.
+      else.
+        nt = abap_true.
+      endif.
+    endif.
+  endmethod.                    &quot;newtab
+endclass.                    &quot;zse16_urb IMPLEMENTATION</source>
+</PROG>
